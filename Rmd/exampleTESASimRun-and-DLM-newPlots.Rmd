@@ -118,9 +118,22 @@ dlm_model <- fitDLM(data = simDataIncreaseProdyCU1,
               alpha_vary = TRUE,
               beta_vary = FALSE)
 
+
+
 # then plot
 plotDLM(dlm_model)
 ```
+
+
+```{r save fitDLM output, message=FALSE,  warning=FALSE, results="hide"}
+
+# save output of fitDLM, to start making boxplot function
+
+saveRDS(dlm_model, file = paste(here(), "simDataIncreaseProdyCU1.Rdata", sep="/"), version=3)
+
+```
+
+
 
 This is pretty decent as well. How about a scenario where only capacity (1/beta) changes over time and where we fit a model that only estimates time varying beta?  
 
@@ -177,13 +190,6 @@ plotDLM(dlm_model)
 ```
 
 Looks like the model has a hard time estimating both alpha and beta, at least for this particular simulated dataset, when both change the same magnitude and direction over the same time period.  
-
-
-
-
-
-
-
 
 
 
