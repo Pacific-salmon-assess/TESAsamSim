@@ -26,34 +26,25 @@ library(here)
 # will need to change "example" to folder of automated outputs and scen to names of
 #     scenarios from table of scenarios to loop over/map over
 
-# scenario <- "simDataIncreaseProdyCU1"
+# pass in the pbias dataframe
+plot_bias_boxplots <- function(pbias) {
 
-plot_bias_boxplots <- function(scenario) {
+ # x_discrete <-  # is the x variable of interest discrete? yes
 
-  dlm_out <- readRDS(here::here( paste0(scenario, ".Rdata")))$results # read in dlm output file (format and location subject to change)
+ alpha <- pbias %>%
+  filter(parameter==alpha_mpb) %>%
+  ggplot(data=pbias,aes(x=factor(scen), y=mpb, fill=estModel))+
+    geom_boxplot(outlier.shape = NA)+
+    # xlab("Stock depletion") +
+    ylab("Mean % bias") +
+    coord_cartesian(ylim=c(-100,400))+
+    scale_fill_viridis_d(labels=c("alpha", "beta"))+
+    #facet_wrap(~paste0("CU ", CU)) +  # facet to CU number, could change to other dimension
+    theme_bw()
 
-# x_discrete <-  # is the x variable of interest discrete?
+  alpha
 
-  pbias <- dlm_out %>%
-    group_by(CU, iteration) %>% # will need to add scenario column as well
-    dplyr::summarize(
-      alpha_mpb=mean((alpha_true-alpha)/alpha_true)*100,
-      beta_mpb=mean((beta_true-beta)/beta_true)*100) %>%
-    pivot_longer(alpha_mpb:beta_mpb,names_to="parameter",values_to="mpb")
 
-# if(x_discrete) == TRUE{
-
-fig <- ggplot(data=pbias,aes(x=factor(scenario), y=mpb, fill=parameter))+ # change scenario to variable of interest
-  geom_boxplot(outlier.shape = NA)+
-  # xlab("Stock depletion") +
-  ylab("Mean % bias") +
-  coord_cartesian(ylim=c(-100,400))+
-  scale_fill_viridis_d(labels=c("alpha", "beta"))+
-  facet_wrap(~paste0("CU ", CU)) +  # facet to CU number, could change to other dimension
-  theme_bw()
-
-fig
-#}
 
 # if(x_discrete == FALSE) {
 
