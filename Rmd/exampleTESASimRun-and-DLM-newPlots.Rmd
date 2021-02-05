@@ -43,6 +43,11 @@ simPar <- read.csv(here("data", "IFCohoPars",
 
 # Directory where simulated data will be saved
 scenNames <- unique(simPar$scenario)
+
+#HACK to add numbers to names so they sort in plots. Could probably use some fancy factor approach
+for(i in 1:length(scenNames)) scenNames[i] <- paste0(i,"_", scenNames[i])
+
+
 dirNames <- sapply(scenNames, function(x) paste(x, unique(simPar$species),
                                                 sep = "_"))
 # loop through each scenario and simulate data
@@ -85,7 +90,7 @@ dlm_Out <- simData[[1]]
 for(i in 2:4) dlm_Out <- rbind(dlm_Out, simData[[i]])
 
 # Now make copies to cover our alternative scenarios
-estNames <- c("Stat", "Alpha_vary", "Beta_vary", "Alpha_Beta_vary")
+estNames <- c("1_Stat", "2_Alpha_vary", "3_Beta_vary", "4_Alpha_Beta_vary")
 dlm_Out_stat <- dlm_Out_alpha <- dlm_Out_beta <- dlm_Out_alphabeta <- dlm_Out
 
 
@@ -147,15 +152,26 @@ dlm_Out_alphabeta <- dlm_Out_alphabeta %>%
   mutate(estModel = estNames[4])
 
 # Now make one gigantic dataframe (not sure if we want this)
-dlm_Out_all_combo <- rbind(dlm_Out_stat, dlm_Out_alpha, dlm_Out_beta,dlm_Out_alphabeta)
+dlm_out_all_combo <- rbind(dlm_Out_stat, dlm_Out_alpha, dlm_Out_beta,dlm_Out_alphabeta)
 
 
 
 ```
 
-
 So now all the outputs are in one giant dataframe
 
+```{r echo=FALSE. warnings=FALSE}
+# Now get bias ... adapted from Brendan's code
+pms <- dlm_out_all_combo %>%
+  group_by(scen,estModel, iteration) %>%
+  dplyr::summarize(
+    alpha_mpb=mean((alpha_true-alpha)/alpha_true)*100,
+    beta_mpb=mean((beta_true-beta)/beta_true)*100) %>%
+  pivot_longer(alpha_mpb:beta_mpb,names_to="parameter",values_to="mpb")
+
+View(pms)
+
+```
 
 
 
