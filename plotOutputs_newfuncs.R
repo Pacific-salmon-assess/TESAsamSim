@@ -31,9 +31,10 @@ plot_bias_boxplots <- function(pbias) {
 
  # x_discrete <-  # is the x variable of interest discrete? yes
 
- alpha <- pbias %>%
-  filter(parameter==alpha_mpb) %>%
-  ggplot(data=pbias,aes(x=factor(scen), y=mpb, fill=estModel))+
+ alpha_bias <- pbias %>%
+   as.data.frame() %>%
+   dplyr::filter(parameter == "alpha_mpb") %>%
+  ggplot(aes(x=factor(scenario), y=mpb, fill=estModel))+
     geom_boxplot(outlier.shape = NA)+
     # xlab("Stock depletion") +
     ylab("Mean % bias") +
@@ -42,7 +43,7 @@ plot_bias_boxplots <- function(pbias) {
     #facet_wrap(~paste0("CU ", CU)) +  # facet to CU number, could change to other dimension
     theme_bw()
 
-  alpha
+ alpha_bias
 
 
 

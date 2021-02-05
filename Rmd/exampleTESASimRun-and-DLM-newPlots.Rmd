@@ -42,7 +42,7 @@ simPar <- read.csv(here("data", "IFCohoPars",
                        stringsAsFactors = F)
 
 # Directory where simulated data will be saved
-scenNames <- unique(simPar$scenarioario)
+scenNames <- unique(simPar$scenario)
 
 #HACK to add numbers to names so they sort in plots. Could probably use some fancy factor approach
 for(i in 1:length(scenNames)) scenNames[i] <- paste0(i,"_", scenNames[i])
