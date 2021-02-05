@@ -54,7 +54,7 @@ dirNames <- sapply(scenNames, function(x) paste(x, unique(simPar$species),
 for (i in 1:4){
  genericRecoverySim(simPar=simPar[i,], cuPar=cuPar,  srDat=srDat,
             variableCU=FALSE, ricPars=NULL, #ricPars,  #cuCustomCorrMat = cuCustomCorrMat,
-            dirName="example", nTrials=4, makeSubDirs=FALSE, random=FALSE)}
+            dirName="example", nTrials=25, makeSubDirs=FALSE, random=FALSE)}
 
 ```
 
@@ -175,6 +175,13 @@ pms <- dlm_out_all_combo %>%
 
 ```
 
+Plot bias
+
+```{r}
+source(here::here("plotOutputs_newfuncs.R"))
+plot_bias_boxplots(pms)
+
+```
 
 
 
