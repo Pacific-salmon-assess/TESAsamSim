@@ -179,6 +179,96 @@ plotDLM(dlm_model)
 Looks like the model has a hard time estimating both alpha and beta, at least for this particular simulated dataset, when both change the same magnitude and direction over the same time period.  
 
 
+START AGAIN HERE
+
+First, load packages, read in data and set up scenarios
+
+```{r, echo=FALSE}
+
+## Check if necessary packages are available and install if necessary
+listOfPackages <- c("here", "parallel", "doParallel", "foreach", 
+                    "tidyverse", "tictoc", "TESAsamSim")
+newPackages <- listOfPackages[!(listOfPackages %in% 
+                                  installed.packages()[ , "Package"])]
+if (length(newPackages)) {
+  install.packages(newPackages)
+}
+lapply(listOfPackages, require, character.only = TRUE)
+
+# load wrapper function to fit dynamic linear models
+source(here("dlm-wrapper.R"))
+
+## Load relevant input data
+# CU-specific parameters
+cuPar <- read.csv(here("data", "IFCohoPars", "cohoCUpars.csv"),
+                  stringsAsFactors=F)
+
+# Stock-recruit and catch data that are used to populate the simulation priming/conditioning period
+srDat <- read.csv(here("data", "IFCohoPars", "cohoRecDatTrim.csv"),
+                  stringsAsFactors=F)
+
+simPar <- read.csv(here("data", "IFCohoPars",
+                         "cohoSimPar.csv"),
+                       stringsAsFactors = F)
+
+# Directory where simulated data will be saved
+scenNames <- unique(simPar$scenario)
+dirNames <- sapply(scenNames, function(x) paste(x, unique(simPar$species),
+                                                sep = "_"))
+# loop through each scenario and simulate data
+for (i in 1:4){
+ genericRecoverySim(simPar=simPar[i,], cuPar=cuPar,  srDat=srDat,
+            variableCU=FALSE, ricPars=NULL, #ricPars,  #cuCustomCorrMat = cuCustomCorrMat,
+            dirName="example", nTrials=5, makeSubDirs=FALSE, random=FALSE)}
+
+```
+
+Borrow Brendan's example code to put all results in the same dataframe.
+
+
+```{r}
+
+# Read the four sim scenarios into a list
+simData <- list()
+simData[[1]] <- readRDS(here("outputs", "simData", "example",
+                         "stationary_ref_CUsrDat.RData"))$srDatout
+simData[[2]] <- readRDS(here("outputs", "simData", "example",
+                         "increaseProd_ref_CUsrDat.RData"))$srDatout
+simData[[3]] <- readRDS(here("outputs", "simData", "example",
+                         "increaseCapacity_ref_CUsrDat.RData"))$srDatout
+simData[[4]] <- readRDS(here("outputs", "simData", "example",
+                         "increaseProd&Capacity_ref_CUsrDat.RData"))$srDatout
+
+for(i in 1:4){
+  simData[[i]] <- simData[[i]] %>% 
+    dplyr::filter(CU == 1) %>% 
+    mutate(scenario = scenNames[i]) %>% 
+    select(scenario, everything()) %>% 
+    rename(byr=year, spwn=spawners, rec=recruits, alpha_true=alpha, beta_true=beta)
+    
+  simData[[i]] <- cbind(simData[[i]],as.data.frame(matrix(NA,nrow(simData[[i]]),4))) %>%
+    rename(alpha=V1, beta=V2, alpha_se=V3, beta_se=V4)
+}
+
+iteration <- unique(simData[[i]]$iteration)
+
+#up to here:
+# look at doing this with purrr or furrr later
+for(j in unique(DLMOut$scen)){
+  for(i in 1:nMC){
+    dlm_model <- fitDLM(data = subset(DLMOut, scen==j & MC==i),
+                        alpha_vary = TRUE,
+                        beta_vary = TRUE)
+    DLMOut[which(DLMOut$scen==j & DLMOut$MC==i),c(8:11)] <- dlm_model$results[,c(12:15)]
+  }
+}
+
+head(DLMOut)
+
+
+
+
+```
 
 
 
