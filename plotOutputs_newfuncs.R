@@ -39,6 +39,7 @@ alpha_bias <- pbias %>%
     #facet_wrap(vars(parameter))+
     xlab("Scenario") +
     ylab("Mean % bias") +
+    ggtitle("alpha")+
     theme(legend.position = "none")+
     theme_bw()
  beta_bias <- pbias %>%
@@ -49,6 +50,7 @@ alpha_bias <- pbias %>%
    #facet_wrap(vars(parameter))+
    xlab("Scenario") +
    ylab("Mean % bias")+
+   ggtitle("beta")+
    theme_bw()
 
  cowplot::plot_grid(alpha_bias, beta_bias, nrow=2)
