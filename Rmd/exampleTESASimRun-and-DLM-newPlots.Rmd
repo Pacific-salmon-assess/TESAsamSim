@@ -171,7 +171,7 @@ pms <- dlm_out_all_combo %>%
     beta_mpb=mean((beta_true-beta)/beta_true)*100) %>%
   pivot_longer(alpha_mpb:beta_mpb,names_to="parameter",values_to="mpb")
 
-View(pms)
+#View(pms)
 
 ```
 

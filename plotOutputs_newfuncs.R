@@ -31,19 +31,27 @@ plot_bias_boxplots <- function(pbias) {
 
  # x_discrete <-  # is the x variable of interest discrete? yes
 
- alpha_bias <- pbias %>%
+alpha_bias <- pbias %>%
    as.data.frame() %>%
    dplyr::filter(parameter == "alpha_mpb") %>%
   ggplot(aes(x=factor(scenario), y=mpb, fill=estModel))+
     geom_boxplot(outlier.shape = NA)+
-    # xlab("Stock depletion") +
+    #facet_wrap(vars(parameter))+
+    xlab("Scenario") +
     ylab("Mean % bias") +
-    coord_cartesian(ylim=c(-100,400))+
-    scale_fill_viridis_d(labels=c("alpha", "beta"))+
-    #facet_wrap(~paste0("CU ", CU)) +  # facet to CU number, could change to other dimension
+    theme(legend.position = "none")+
     theme_bw()
+ beta_bias <- pbias %>%
+   as.data.frame() %>%
+   dplyr::filter(parameter == "beta_mpb") %>%
+  ggplot(aes(x=factor(scenario), y=mpb, fill=estModel))+
+   geom_boxplot(outlier.shape = NA)+
+   #facet_wrap(vars(parameter))+
+   xlab("Scenario") +
+   ylab("Mean % bias")+
+   theme_bw()
 
- alpha_bias
+ cowplot::plot_grid(alpha_bias, beta_bias, nrow=2)
 
 
 
